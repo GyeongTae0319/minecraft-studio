@@ -20,8 +20,8 @@ const { icon, color, size } = defineProps({
   },
 });
 
-const rootStyles = <StyleValue>computed(() => {
-  return {
+const rootStyles = computed(() => {
+  return <StyleValue>{
     "--fill": color,
     "--size": computedSize.value,
     "--mask-size": `calc(${icons.width / 16} * ${computedSize.value})`,
