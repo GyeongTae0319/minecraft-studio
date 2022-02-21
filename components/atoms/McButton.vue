@@ -1,7 +1,5 @@
-<script setup lang="ts"></script>
-
 <template>
-  <button class="mc-button">
+  <button class="mc-button" @contextmenu.prevent>
     <div class="mc-button__container">
       <slot />
     </div>
@@ -20,6 +18,7 @@
   font-weight: bold;
 
   cursor: pointer;
+  user-select: none;
 
   &:focus-visible {
     box-shadow: 0 0 0 var(--pixel-unit) #ffffff;
