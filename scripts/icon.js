@@ -83,7 +83,14 @@ class IconSpriteBuilder {
   }
   writeFiles() {
     writeFileSync(this.outputPath.sprite, this.canvas.toBuffer());
-    writeFileSync(this.outputPath.map, JSON.stringify(this.spriteMap));
+    writeFileSync(
+      this.outputPath.map,
+      JSON.stringify({
+        width: this.size,
+        height: this.size,
+        map: this.spriteMap,
+      })
+    );
   }
 }
 
