@@ -1,31 +1,58 @@
 "use strict";
 
-import Canvas from "canvas";
+import canvas from "canvas";
 import { readdirSync, writeFileSync } from "fs";
 import path from "path";
 
+/**
+ * @typedef {{
+ *   x: number;
+ *   y: number;
+ * }} Coords
+ */
+
 class IconSpriteBuilder {
-  /**@type {string} */
   path = "";
+  outputPath = {
+    sprite: "",
+    map: "",
+  };
   /**@type {string[]} */
   files = [];
-  /**@type {number} */
   size = 0;
+  /**@type {import("canvas").Canvas} */
+  canvas = null;
+  /**@type {import("canvas").CanvasRenderingContext2D} */
+  context = null;
+  /**@type {Record<string, Coords>} */
+  spriteMap = {};
 
-  /**@param {string} path */
-  constructor(path) {
-    this.path = path.replace(/\/?$/, "/");
+  /**
+   * @param {{
+   *   path: string;
+   *   output: {
+   *     sprite: string;
+   *     map: string;
+   *   };
+   * }} options
+   */
+  constructor(options) {
+    this.path = options.path.replace(/\/?$/, "/");
+    this.outputPath = { ...options.output };
   }
 
-  build() {
+  async build() {
     this.getIconFiles();
     this.computeSize();
-    this.drawSprite();
+    this.initCanvas();
+    await this.drawSprite();
+    this.writeFiles();
   }
 
   getIconFiles() {
-    this.files = readdirSync(this.path).filter((name) => {
-      return path.extname(name) === ".png";
+    const files = readdirSync(this.path);
+    this.files = files.filter((fileName) => {
+      return path.extname(fileName) === ".png";
     });
   }
   computeSize() {
@@ -35,26 +62,35 @@ class IconSpriteBuilder {
     }
     this.size = col * 16;
   }
+  initCanvas() {
+    this.canvas = canvas.createCanvas(this.size, this.size);
+    this.context = this.canvas.getContext("2d");
+  }
   async drawSprite() {
-    const canvas = Canvas.createCanvas(this.size, this.size);
-    const ctx = canvas.getContext("2d");
-    const map = {};
-
-    for (const i in this.files) {
+    for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i];
-      const image = await Canvas.loadImage(this.path + file);
-      const pos = [(i % (this.size / 16)) * 16, Math.floor(i / (this.size / 16)) * 16];
-      ctx.drawImage(image, pos[0], pos[1]);
-      map[path.basename(file, path.extname(file))] = {
-        x: pos[0],
-        y: pos[1],
+      /**@type {Coords} */
+      const pos = {
+        x: (i % (this.size / 16)) * 16,
+        y: Math.floor(i / (this.size / 16)) * 16,
       };
-    }
+      const image = await canvas.loadImage(this.path + file);
+      this.context.drawImage(image, pos.x, pos.y);
 
-    writeFileSync("./test.png", canvas.toBuffer());
-    writeFileSync("./test.json", JSON.stringify(map));
+      const name = path.basename(file, path.extname(file));
+      this.spriteMap[name] = { ...pos };
+    }
+  }
+  writeFiles() {
+    writeFileSync(this.outputPath.sprite, this.canvas.toBuffer());
+    writeFileSync(this.outputPath.map, JSON.stringify(this.spriteMap));
   }
 }
 
-const builder = new IconSpriteBuilder("../assets/icons");
-builder.build();
+new IconSpriteBuilder({
+  path: "./assets/icons",
+  output: {
+    sprite: "./assets/icons.png",
+    map: "./assets/icons.map.json",
+  },
+}).build();
