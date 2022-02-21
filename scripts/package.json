@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "canvas": "^2.9.0"
+  }
+}
