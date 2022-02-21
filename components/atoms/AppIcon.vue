@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { StyleValue } from "nuxt3/dist/app/compat/capi";
+import icons from "~/assets/icons.map.json";
+import { PropType, StyleValue } from "nuxt3/dist/app/compat/capi";
 
 const { icon, color, size } = defineProps({
   icon: {
-    default: "",
+    default: <keyof typeof icons.map>"cube",
     required: true,
-    type: String,
+    type: <PropType<keyof typeof icons.map>>String,
   },
   color: {
     default: "currentColor",
@@ -22,8 +23,14 @@ const { icon, color, size } = defineProps({
 const rootStyles = <StyleValue>computed(() => {
   return {
     "--fill": color,
-    "--size": String(computedSize.value),
+    "--size": computedSize.value,
+    "--mask-size": `calc(${icons.width / 16} * ${computedSize.value})`,
+    "--top": `calc(-${computedPos.value.y / 16} * ${computedSize.value})`,
+    "--left": `calc(-${computedPos.value.x / 16} * ${computedSize.value})`,
   };
+});
+const computedPos = computed(() => {
+  return icons.map[icon];
 });
 const computedSize = computed(() => {
   if (isNaN(Number(size))) {
@@ -45,9 +52,9 @@ const computedSize = computed(() => {
   height: var(--size);
 
   background-color: var(--fill);
-  background-size: calc(var(--size) * 2);
   mask-image: url("~/assets/icons.png");
-  mask-size: 200%;
+  mask-size: var(--mask-size);
+  mask-position: var(--left) var(--top);
 
   image-rendering: pixelated;
 }
