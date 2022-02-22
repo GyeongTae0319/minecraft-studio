@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import icons from "~/assets/icons.map.json";
-import { PropType, StyleValue } from "nuxt3/dist/app/compat/capi";
+import { StyleValue } from "nuxt3/dist/app/compat/capi";
 
-const { icon, color, size } = defineProps({
-  icon: {
-    default: <keyof typeof icons.map>"cube",
-    required: true,
-    type: <PropType<keyof typeof icons.map>>String,
-  },
-  color: {
-    default: "currentColor",
-    required: false,
-    type: String,
-  },
-  size: {
-    default: 16,
-    required: false,
-    type: [Number, String],
-  },
+interface Props {
+  icon: keyof typeof icons.map;
+  color?: string;
+  size?: number | string;
+}
+
+const { icon, color, size } = withDefaults(defineProps<Props>(), {
+  color: "currentColor",
+  size: 16,
 });
 
 const rootStyles = computed(() => {
