@@ -30,12 +30,23 @@ const attrs = computed(() => {
       return {};
   }
 });
+
+const root = ref<HTMLAnchorElement | HTMLButtonElement>(null);
+
+function focus() {
+  root.value.focus();
+}
+
+defineExpose({
+  focus,
+});
 </script>
 
 <template>
   <component
     v-bind="attrs"
     :is="tagName"
+    ref="root"
     class="app-button"
     @contextmenu.prevent
   >
