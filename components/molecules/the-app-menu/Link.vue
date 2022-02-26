@@ -18,7 +18,7 @@ const { to, icon, label, exact, focusable } = withDefaults(
     exact: false,
   }
 );
-const root = ref<AppButtonInstance>(null);
+const rootElement = ref<AppButtonInstance>(null);
 
 const linkClasses = computed(() => ({
   "the-app-menu-link__link--exact": exact,
@@ -28,7 +28,7 @@ const tabIndex = computed(() => {
 });
 
 function focus() {
-  root.value.focus();
+  rootElement.value.focus();
 }
 
 defineExpose({
@@ -42,7 +42,7 @@ defineExpose({
       <AppButton
         :to="to"
         :tabindex="tabIndex"
-        ref="root"
+        ref="rootElement"
         class="the-app-menu-link__link"
         :class="linkClasses"
       >
@@ -79,7 +79,8 @@ defineExpose({
       --background-opacity: 0.12;
       color: $color-font-strong;
     }
-    &:hover {
+    &:hover,
+    &:focus-visible {
       --background-opacity: 0.08;
     }
     &:active {
