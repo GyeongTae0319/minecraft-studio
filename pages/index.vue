@@ -15,12 +15,6 @@
           Button
         </div>
       </McButton>
-      <McButton class="flex__button">
-        <div class="flex__button__container">
-          <AppIcon icon="cube" size="32" />
-          Button
-        </div>
-      </McButton>
     </div>
   </div>
 </template>
