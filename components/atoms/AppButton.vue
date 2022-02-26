@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DefineComponent } from "nuxt3/dist/app/compat/capi";
 import { RouteLocationRaw } from "vue-router";
 
 interface Props {
@@ -10,7 +11,7 @@ const { to, href } = defineProps<Props>();
 
 const tagName = computed(() => {
   if (to) {
-    return "RouterLink";
+    return "NuxtLink";
   } else if (href) {
     return "a";
   } else {
@@ -19,7 +20,7 @@ const tagName = computed(() => {
 });
 const attrs = computed(() => {
   switch (tagName.value) {
-    case "RouterLink":
+    case "NuxtLink":
       return { to: to };
     case "a":
       return {
@@ -31,10 +32,17 @@ const attrs = computed(() => {
   }
 });
 
-const root = ref<HTMLAnchorElement | HTMLButtonElement>(null);
+const rootElement = ref<
+  InstanceType<DefineComponent> | HTMLAnchorElement | HTMLButtonElement | null
+>(null);
 
 function focus() {
-  root.value.focus();
+  if (rootElement.value instanceof HTMLElement) {
+    rootElement.value.focus();
+  } else {
+    const anchorElement = <HTMLAnchorElement>rootElement.value?.$el;
+    anchorElement?.focus();
+  }
 }
 
 defineExpose({
@@ -46,7 +54,7 @@ defineExpose({
   <component
     v-bind="attrs"
     :is="tagName"
-    ref="root"
+    ref="rootElement"
     class="app-button"
     @contextmenu.prevent
   >
