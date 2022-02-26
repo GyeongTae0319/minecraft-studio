@@ -1,7 +1,7 @@
 "use strict";
 
 import canvas from "canvas";
-import { readdirSync, writeFileSync } from "fs";
+import { readdirSync, renameSync, writeFileSync } from "fs";
 import path from "path";
 
 /**
@@ -43,6 +43,7 @@ class IconSpriteBuilder {
 
   async build() {
     this.getIconFiles();
+    this.removeFigmaExportPrefix();
     this.computeSize();
     this.initCanvas();
     await this.drawSprite();
@@ -53,6 +54,13 @@ class IconSpriteBuilder {
     const files = readdirSync(this.path);
     this.files = files.filter((fileName) => {
       return path.extname(fileName) === ".png";
+    });
+  }
+  removeFigmaExportPrefix() {
+    this.files.forEach((fileName, index) => {
+      const newName = fileName.replace(/^.*?=/, "");
+      renameSync(this.path + fileName, this.path + newName);
+      this.files[index] = newName;
     });
   }
   computeSize() {

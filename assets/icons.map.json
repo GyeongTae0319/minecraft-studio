@@ -1,1 +1,1 @@
-{"width":32,"height":32,"map":{"cube":{"x":0,"y":0},"menu":{"x":16,"y":0},"more":{"x":0,"y":16}}}
+{"width":64,"height":64,"map":{"arrow-head-down":{"x":0,"y":0},"arrow-head-left":{"x":16,"y":0},"arrow-head-right":{"x":32,"y":0},"arrow-head-up":{"x":48,"y":0},"close":{"x":0,"y":16},"cube":{"x":16,"y":16},"menu":{"x":32,"y":16},"more":{"x":48,"y":16}}}
