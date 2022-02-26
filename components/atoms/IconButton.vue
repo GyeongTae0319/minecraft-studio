@@ -47,7 +47,7 @@ const { icon, size } = withDefaults(defineProps<Props>(), {
 
   &:hover,
   &:focus-visible {
-    --shadow-opacity: 0.1;
+    --shadow-opacity: 0.08;
     --shadow-size: 125%;
   }
   &:active {
