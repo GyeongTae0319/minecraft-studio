@@ -3,14 +3,17 @@ import icons from "~/assets/icons.map.json";
 
 interface Props {
   icon: keyof typeof icons.map;
+  size?: number | string;
 }
 
-const { icon } = defineProps<Props>();
+const { icon, size } = withDefaults(defineProps<Props>(), {
+  size: 32,
+});
 </script>
 
 <template>
   <AppButton class="icon-button">
-    <AppIcon :icon="icon" size="32" class="icon-button__icon" />
+    <AppIcon :icon="icon" :size="size" class="icon-button__icon" />
   </AppButton>
 </template>
 
