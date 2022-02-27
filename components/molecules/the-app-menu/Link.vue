@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { RouteLocationRaw } from "vue-router";
+import { RouteLocationRaw, NavigationFailure } from "vue-router";
 import AppButton from "~/components/atoms/AppButton.vue";
 
 type AppButtonInstance = InstanceType<typeof AppButton>;
+type RouterNavigate = (e?: MouseEvent) => Promise<void | NavigationFailure>;
 
+interface Emits {
+  (event: "navigate", next: RouterNavigate): void;
+}
 interface Props {
   to: RouteLocationRaw;
   icon: string;
@@ -12,18 +16,24 @@ interface Props {
   focusable: boolean;
 }
 
+const emit = defineEmits<Emits>();
 const props = withDefaults(defineProps<Props>(), {
   exact: false,
 });
+
 const { to, icon, label, exact, focusable } = toRefs(props);
-const rootElement = ref<AppButtonInstance>(null);
+const focusElement = ref<AppButtonInstance>(null);
 
 const linkClasses = computed(() => ({
   "the-app-menu-link__link--exact": exact.value,
 }));
 
+async function customNavigate(navigate: RouterNavigate) {
+  emit("navigate", navigate);
+}
+
 function focus() {
-  rootElement.value.focus();
+  focusElement.value.focus();
 }
 
 defineExpose({
@@ -34,18 +44,23 @@ defineExpose({
 <template>
   <li class="the-app-menu-link">
     <div class="the-app-menu-link__wrapper" role="listitem">
-      <AppButton
-        :to="to"
-        :tabindex="focusable ? 0 : -1"
-        ref="rootElement"
-        class="the-app-menu-link__link"
-        :class="linkClasses"
-      >
-        <span class="the-app-menu-link__link__icon" aria-hidden>
-          {{ icon }}
-        </span>
-        <span class="the-app-menu-link__link__label">{{ label }}</span>
-      </AppButton>
+      <NuxtLink :to="to" custom v-slot="{ href, navigate }">
+        <a
+          :href="href"
+          ref="focusElement"
+          :tabindex="focusable ? 0 : -1"
+          class="the-app-menu-link__link"
+          :class="linkClasses"
+          @contextmenu.prevent
+          @click.prevent="customNavigate(navigate)"
+          @keyup.space="customNavigate(navigate)"
+        >
+          <span class="the-app-menu-link__link__icon" aria-hidden>
+            {{ icon }}
+          </span>
+          <span class="the-app-menu-link__link__label">{{ label }}</span>
+        </a>
+      </NuxtLink>
     </div>
   </li>
 </template>

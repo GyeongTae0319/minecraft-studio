@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { createFocusTrap, FocusTrap } from "focus-trap";
+import { NavigationFailure } from "vue-router";
 
 interface Emits {
   (event: "activate"): void;
@@ -11,6 +12,7 @@ interface Link {
   label: string;
   exact?: boolean;
 }
+type RouterNavigate = (e?: MouseEvent) => Promise<void | NavigationFailure>;
 
 const emit = defineEmits<Emits>();
 
@@ -29,6 +31,7 @@ const links: Link[] = [
 ];
 const rootElement = ref<HTMLElement>(null);
 let focusTrap: FocusTrap = null;
+let popStateAction: Function = null;
 const isActive = ref(false);
 
 onMounted(() => {
@@ -41,6 +44,10 @@ onBeforeUnmount(() => {
 });
 function onWindowPopState() {
   doDeactivate();
+  if (typeof popStateAction === "function") {
+    popStateAction();
+    popStateAction = null;
+  }
 }
 function onWindowKeyDown(event: KeyboardEvent) {
   if (event.key === "Escape" || event.key === "Esc") {
@@ -58,7 +65,7 @@ function show() {
   }
 }
 function close() {
-  history.back();
+  useRouter().back();
 }
 
 function activateFocusTrap() {
@@ -77,6 +84,10 @@ function doDeactivate() {
     emit("deactivate");
   }
 }
+function doNavigate(next: RouterNavigate) {
+  popStateAction = () => nextTick(next);
+  close();
+}
 
 defineExpose({
   show,
@@ -88,7 +99,7 @@ defineExpose({
   <nav ref="rootElement" class="the-app-menu" aria-label="App Menu">
     <header class="the-app-menu__header">Menu</header>
     <div class="the-app-menu__list-wrapper">
-      <TheAppMenuLinkList :links="links" />
+      <TheAppMenuLinkList :links="links" @navigate="doNavigate" />
     </div>
   </nav>
 </template>

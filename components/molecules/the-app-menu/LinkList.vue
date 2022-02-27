@@ -1,18 +1,26 @@
 <script setup lang="ts">
+import { NavigationFailure } from "vue-router";
 import TheAppMenuLink from "./Link.vue";
 
-type TheAppMenuLinkInstance = InstanceType<typeof TheAppMenuLink>;
+interface Props {
+  links: Link[];
+}
+interface Emits {
+  (event: "navigate", next: RouterNavigate): void;
+}
+
 interface Link {
   to: string;
   icon: string;
   label: string;
   exact?: boolean;
 }
+type TheAppMenuLinkInstance = InstanceType<typeof TheAppMenuLink>;
+type RouterNavigate = (e?: MouseEvent) => Promise<void | NavigationFailure>;
 
-interface Props {
-  links: Link[];
-}
 const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
+
 const { links } = toRefs(props);
 const linkElements = ref<TheAppMenuLinkInstance[]>(
   new Array(links.value.length)
@@ -64,6 +72,7 @@ function moveFocus(dir: "prev" | "next") {
         :focusable="index === selectedLinkIndex"
         :ref="(el: TheAppMenuLinkInstance) => (linkElements[index] = el)"
         class="the-app-menu-link-list__list__item"
+        @navigate="emit('navigate', $event)"
       />
     </ul>
   </div>
