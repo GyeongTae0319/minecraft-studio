@@ -7,12 +7,13 @@ interface Props {
   href?: string;
 }
 
-const { to, href } = defineProps<Props>();
+const props = defineProps<Props>();
+const { to, href } = toRefs(props);
 
 const tagName = computed(() => {
-  if (to) {
+  if (to.value) {
     return "NuxtLink";
-  } else if (href) {
+  } else if (href.value) {
     return "a";
   } else {
     return "button";
@@ -21,10 +22,10 @@ const tagName = computed(() => {
 const attrs = computed(() => {
   switch (tagName.value) {
     case "NuxtLink":
-      return { to: to };
+      return { to: to.value };
     case "a":
       return {
-        href: href,
+        href: href.value,
         target: "_blank",
       };
     default:

@@ -8,14 +8,15 @@ interface Props {
   size?: number | string;
 }
 
-const { icon, color, size } = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   color: "currentColor",
   size: 16,
 });
+const { icon, color, size } = toRefs(props);
 
 const rootStyles = computed(() => {
   return <StyleValue>{
-    "--fill": color,
+    "--fill": color.value,
     "--size": computedSize.value,
     "--mask-size": `calc(${icons.width / 16} * ${computedSize.value})`,
     "--top": `calc(-${computedPos.value.y / 16} * ${computedSize.value})`,
@@ -23,13 +24,13 @@ const rootStyles = computed(() => {
   };
 });
 const computedPos = computed(() => {
-  return icons.map[icon];
+  return icons.map[icon.value];
 });
 const computedSize = computed(() => {
-  if (isNaN(Number(size))) {
-    return size;
+  if (isNaN(Number(size.value))) {
+    return size.value;
   }
-  return size + "px";
+  return size.value + "px";
 });
 </script>
 

@@ -6,9 +6,10 @@ interface Props {
   size?: number | string;
 }
 
-const { icon, size } = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   size: 32,
 });
+const { icon, size } = toRefs(props);
 </script>
 
 <template>

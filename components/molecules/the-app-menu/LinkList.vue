@@ -12,12 +12,15 @@ interface Link {
 interface Props {
   links: Link[];
 }
-const { links } = defineProps<Props>();
-const linkElements = ref<TheAppMenuLinkInstance[]>(new Array(links.length));
+const props = defineProps<Props>();
+const { links } = toRefs(props);
+const linkElements = ref<TheAppMenuLinkInstance[]>(
+  new Array(links.value.length)
+);
 
 const selectedLinkIndex = ref(0);
 const lastLinkIndex = computed(() => {
-  return links.length - 1;
+  return links.value.length - 1;
 });
 
 function moveFocusUsingKeyboard(event: KeyboardEvent) {
@@ -38,14 +41,13 @@ function moveFocus(dir: "prev" | "next") {
   targetIndex += dirMap[dir];
 
   if (targetIndex < 0) {
+    targetIndex = 0;
+  } else if (targetIndex > lastLinkIndex.value) {
     targetIndex = lastLinkIndex.value;
-  }
-  if (targetIndex > lastLinkIndex.value) {
-    targetIndex = 1;
   }
 
   selectedLinkIndex.value = targetIndex;
-  linkElements.value[targetIndex]?.focus();
+  linkElements.value[targetIndex].focus();
 }
 </script>
 

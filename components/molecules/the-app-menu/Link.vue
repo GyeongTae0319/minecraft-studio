@@ -12,20 +12,15 @@ interface Props {
   focusable: boolean;
 }
 
-const { to, icon, label, exact, focusable } = withDefaults(
-  defineProps<Props>(),
-  {
-    exact: false,
-  }
-);
+const props = withDefaults(defineProps<Props>(), {
+  exact: false,
+});
+const { to, icon, label, exact, focusable } = toRefs(props);
 const rootElement = ref<AppButtonInstance>(null);
 
 const linkClasses = computed(() => ({
-  "the-app-menu-link__link--exact": exact,
+  "the-app-menu-link__link--exact": exact.value,
 }));
-const tabIndex = computed(() => {
-  return focusable ? 0 : -1;
-});
 
 function focus() {
   rootElement.value.focus();
@@ -41,7 +36,7 @@ defineExpose({
     <div class="the-app-menu-link__wrapper" role="listitem">
       <AppButton
         :to="to"
-        :tabindex="tabIndex"
+        :tabindex="focusable ? 0 : -1"
         ref="rootElement"
         class="the-app-menu-link__link"
         :class="linkClasses"
