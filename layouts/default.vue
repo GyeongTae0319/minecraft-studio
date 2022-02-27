@@ -5,53 +5,47 @@ type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
 
 const menuElement = ref<TheAppMenuInstance>(null);
 const menuIsOpened = ref(false);
+const mainIsDisabled = ref(false);
 
-const rootClasses = computed(() => [
-  "layout",
-  {
-    "layout--menu-opened": menuIsOpened.value,
-  },
-]);
-const mainClasses = computed(() => [
-  "layout__main",
-  {
-    "layout__main--disabled": menuIsOpened.value,
-  },
-]);
+const rootClasses = computed(() => ({
+  "layout--menu-opened": mainIsDisabled.value,
+}));
+const mainClasses = computed(() => ({
+  "layout__main--disabled": menuIsOpened.value,
+}));
 const currentRouteName = computed(() => {
   return useRoute().name;
 });
 
-function onActivateMenu() {
-  menuIsOpened.value = true;
-}
-function onDeactivateMenu() {
-  menuIsOpened.value = false;
-}
-
 function openMenu() {
-  menuElement.value.activate();
+  menuElement.value.show();
 }
 function closeMenu() {
-  menuElement.value.deactivate();
+  menuElement.value.close();
 }
 </script>
 
 <template>
-  <div :class="rootClasses">
+  <div class="layout" :class="rootClasses">
     <div class="layout__menu">
       <TheAppMenu
         ref="menuElement"
-        @activate="onActivateMenu"
-        @deactivate="onDeactivateMenu"
+        @activate="menuIsOpened = true"
+        @deactivate="menuIsOpened = false"
       />
     </div>
-    <div :class="mainClasses">
+    <div class="layout__main" :class="mainClasses">
       <TheAppHeader @open-menu="openMenu">
         <template #title>{{ currentRouteName }}</template>
       </TheAppHeader>
       <slot />
-      <Transition name="layout__main__overlay">
+      <Transition
+        name="layout__main__overlay"
+        @enter="mainIsDisabled = true"
+        @enter-cancelled="mainIsDisabled = false"
+        @after-leave="mainIsDisabled = false"
+        @leave-cancelled="mainIsDisabled = true"
+      >
         <div
           v-if="menuIsOpened"
           class="layout__main__overlay"

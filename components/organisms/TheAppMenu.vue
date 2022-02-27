@@ -30,7 +30,34 @@ const rootElement = ref<HTMLElement>(null);
 let focusTrap: FocusTrap = null;
 const isActive = ref(false);
 
-function activate() {
+onMounted(() => {
+  window.addEventListener("popstate", onWindowPopState);
+  window.addEventListener("keydown", onWindowKeyDown);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("popstate", onWindowPopState);
+  window.removeEventListener("keydown", onWindowKeyDown);
+});
+
+function onWindowPopState() {
+  doDeactivate();
+}
+function onWindowKeyDown(event: KeyboardEvent) {
+  if (event.key === "Escape" || event.key === "Esc") {
+    event.preventDefault();
+    close();
+  }
+}
+
+function show() {
+  doActivate();
+}
+function close() {
+  history.back();
+}
+
+function doActivate() {
+  history.pushState({}, "");
   if (!isActive.value) {
     isActive.value = true;
     activateFocusTrap();
@@ -46,7 +73,7 @@ function activateFocusTrap() {
   }
   focusTrap.activate();
 }
-function deactivate() {
+function doDeactivate() {
   if (isActive.value) {
     isActive.value = false;
     focusTrap.deactivate();
@@ -55,8 +82,8 @@ function deactivate() {
 }
 
 defineExpose({
-  activate,
-  deactivate,
+  show,
+  close,
 });
 </script>
 
