@@ -8,7 +8,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
 const { to, href } = toRefs(props);
+const rootElement = ref<
+  InstanceType<DefineComponent> | HTMLAnchorElement | HTMLButtonElement | null
+>(null);
 
 const tagName = computed(() => {
   if (to.value) {
@@ -32,10 +36,6 @@ const attrs = computed(() => {
       return {};
   }
 });
-
-const rootElement = ref<
-  InstanceType<DefineComponent> | HTMLAnchorElement | HTMLButtonElement | null
->(null);
 
 function focus() {
   if (rootElement.value instanceof HTMLElement) {

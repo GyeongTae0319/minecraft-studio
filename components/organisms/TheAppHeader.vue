@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import IconButton from "../atoms/IconButton.vue";
-const emit = defineEmits<{
+
+interface Emits {
   (event: "open-menu"): void;
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 function openMenu() {
   emit("open-menu");

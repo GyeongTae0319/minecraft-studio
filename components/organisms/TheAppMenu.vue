@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { createFocusTrap, FocusTrap } from "focus-trap";
 
+interface Emits {
+  (event: "activate"): void;
+  (event: "deactivate"): void;
+}
 interface Link {
   to: string;
   icon: string;
@@ -8,10 +12,7 @@ interface Link {
   exact?: boolean;
 }
 
-const emit = defineEmits<{
-  (event: "activate"): void;
-  (event: "deactivate"): void;
-}>();
+const emit = defineEmits<Emits>();
 
 const links: Link[] = [
   {
@@ -38,7 +39,6 @@ onBeforeUnmount(() => {
   window.removeEventListener("popstate", onWindowPopState);
   window.removeEventListener("keydown", onWindowKeyDown);
 });
-
 function onWindowPopState() {
   doDeactivate();
 }
@@ -50,13 +50,6 @@ function onWindowKeyDown(event: KeyboardEvent) {
 }
 
 function show() {
-  doActivate();
-}
-function close() {
-  history.back();
-}
-
-function doActivate() {
   history.pushState({}, "");
   if (!isActive.value) {
     isActive.value = true;
@@ -64,6 +57,10 @@ function doActivate() {
     emit("activate");
   }
 }
+function close() {
+  history.back();
+}
+
 function activateFocusTrap() {
   if (!focusTrap) {
     focusTrap = createFocusTrap(rootElement.value, {
