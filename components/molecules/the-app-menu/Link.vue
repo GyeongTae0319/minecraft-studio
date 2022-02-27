@@ -28,7 +28,8 @@ const linkClasses = computed(() => ({
   "the-app-menu-link__link--exact": exact.value,
 }));
 
-async function customNavigate(navigate: RouterNavigate) {
+async function customNavigate(isActive: boolean, navigate: RouterNavigate) {
+  if (isActive) return;
   emit("navigate", navigate);
 }
 
@@ -44,7 +45,7 @@ defineExpose({
 <template>
   <li class="the-app-menu-link">
     <div class="the-app-menu-link__wrapper" role="listitem">
-      <NuxtLink :to="to" custom v-slot="{ href, navigate }">
+      <NuxtLink :to="to" custom v-slot="{ href, isExactActive, navigate }">
         <a
           :href="href"
           ref="focusElement"
@@ -52,8 +53,8 @@ defineExpose({
           class="the-app-menu-link__link"
           :class="linkClasses"
           @contextmenu.prevent
-          @click.prevent="customNavigate(navigate)"
-          @keyup.space="customNavigate(navigate)"
+          @click.prevent="customNavigate(isExactActive, navigate)"
+          @keyup.space="customNavigate(isExactActive, navigate)"
         >
           <span class="the-app-menu-link__link__icon" aria-hidden>
             {{ icon }}
