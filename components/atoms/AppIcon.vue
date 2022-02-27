@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import icons from "~/assets/icons.map.json";
+import icons from "~/assets/sprites/icons.map.json";
 import { StyleValue } from "nuxt3/dist/app/compat/capi";
 
 interface Props {
@@ -46,7 +46,7 @@ const computedSize = computed(() => {
   height: var(--size);
 
   background-color: var(--fill);
-  mask-image: url("~/assets/icons.png");
+  mask-image: url("~/assets/sprites/icons.png");
   mask-size: var(--mask-size);
   mask-position: var(--left) var(--top);
 

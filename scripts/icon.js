@@ -12,7 +12,7 @@ import path from "path";
  */
 
 class IconSpriteBuilder {
-  path = "";
+  inputFolder = "";
   outputPath = {
     sprite: "",
     map: "",
@@ -29,7 +29,7 @@ class IconSpriteBuilder {
 
   /**
    * @param {{
-   *   path: string;
+   *   input: string;
    *   output: {
    *     sprite: string;
    *     map: string;
@@ -37,7 +37,7 @@ class IconSpriteBuilder {
    * }} options
    */
   constructor(options) {
-    this.path = options.path.replace(/\/?$/, "/");
+    this.inputFolder = options.input.replace(/\/?$/, "/");
     this.outputPath = { ...options.output };
   }
 
@@ -51,7 +51,7 @@ class IconSpriteBuilder {
   }
 
   getIconFiles() {
-    const files = readdirSync(this.path);
+    const files = readdirSync(this.inputFolder);
     this.files = files.filter((fileName) => {
       return path.extname(fileName) === ".png";
     });
@@ -59,7 +59,7 @@ class IconSpriteBuilder {
   removeFigmaExportPrefix() {
     this.files.forEach((fileName, index) => {
       const newName = fileName.replace(/^.*?=/, "");
-      renameSync(this.path + fileName, this.path + newName);
+      renameSync(this.inputFolder + fileName, this.inputFolder + newName);
       this.files[index] = newName;
     });
   }
@@ -82,7 +82,7 @@ class IconSpriteBuilder {
         x: (i % (this.size / 16)) * 16,
         y: Math.floor(i / (this.size / 16)) * 16,
       };
-      const image = await canvas.loadImage(this.path + file);
+      const image = await canvas.loadImage(this.inputFolder + file);
       this.context.drawImage(image, pos.x, pos.y);
 
       const name = path.basename(file, path.extname(file));
@@ -103,9 +103,9 @@ class IconSpriteBuilder {
 }
 
 new IconSpriteBuilder({
-  path: "./assets/icons",
+  input: "./assets/icons",
   output: {
-    sprite: "./assets/icons.png",
-    map: "./assets/icons.map.json",
+    sprite: "./assets/sprites/icons.png",
+    map: "./assets/sprites/icons.map.json",
   },
 }).build();

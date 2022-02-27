@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import icons from "~/assets/icons.map.json";
+import icons from "~/assets/sprites/icons.map.json";
 
 interface Props {
   icon: keyof typeof icons.map;

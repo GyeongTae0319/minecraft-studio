@@ -40,13 +40,13 @@
 
     background-color: #d0d1d4;
     border: var(--pixel-unit) solid;
-    border-image: url("assets/button-default.png") 1;
+    border-image: url("~/assets/sprites/button-default.png") 1;
 
     text-align: center;
 
     .mc-button:active > & {
       background-color: #3c8527;
-      border-image-source: url("assets/button-active.png");
+      border-image-source: url("~/assets/sprites/button-active.png");
     }
   }
 }
