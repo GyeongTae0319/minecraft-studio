@@ -28,6 +28,7 @@
 }
 
 html {
+  user-select: none;
   background-color: var(--color-background-normal);
   color: var(--color-font-normal);
 }

@@ -18,7 +18,6 @@
   font-weight: bold;
 
   cursor: pointer;
-  user-select: none;
 
   &:focus-visible {
     box-shadow: 0 0 0 var(--pixel-unit) #ffffff;

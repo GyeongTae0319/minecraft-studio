@@ -67,6 +67,5 @@ defineExpose({
 .app-button {
   display: inline-flex;
   cursor: pointer;
-  user-select: none;
 }
 </style>
