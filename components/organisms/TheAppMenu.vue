@@ -57,14 +57,14 @@ function onWindowKeyDown(event: KeyboardEvent) {
 }
 
 function show() {
+  if (isActive.value) return;
   history.pushState({}, "");
-  if (!isActive.value) {
-    isActive.value = true;
-    activateFocusTrap();
-    emit("activate");
-  }
+  isActive.value = true;
+  activateFocusTrap();
+  emit("activate");
 }
 function close() {
+  if (!isActive.value) return;
   useRouter().back();
 }
 
@@ -78,11 +78,10 @@ function activateFocusTrap() {
   focusTrap.activate();
 }
 function doDeactivate() {
-  if (isActive.value) {
-    isActive.value = false;
-    focusTrap.deactivate();
-    emit("deactivate");
-  }
+  if (!isActive.value) return;
+  isActive.value = false;
+  focusTrap.deactivate();
+  emit("deactivate");
 }
 function doNavigate(next: RouterNavigate) {
   popStateAction = () => nextTick(next);
