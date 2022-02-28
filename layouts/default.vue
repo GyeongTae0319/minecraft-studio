@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { isFocusable } from "tabbable";
 import TheAppMenu from "~/components/organisms/TheAppMenu.vue";
 
 type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
@@ -6,6 +7,7 @@ type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
 const currentRouteName = computed(() => {
   return useRoute().name;
 });
+const rootElement = ref<HTMLDivElement>(null);
 const menuElement = ref<TheAppMenuInstance>(null);
 const menuOpened = ref(false);
 const nowGesture = ref(false);
@@ -40,8 +42,9 @@ onUnmounted(() => {
 
 function handleGestureStart(event: PointerEvent) {
   if (event.button !== 0 || event.buttons !== 1) return;
-  event.preventDefault();
   const target = <HTMLElement>event.target;
+  if (isFocusableRecursively(target)) return;
+  event.preventDefault();
   target.setPointerCapture(event.pointerId);
   nowGesture.value = true;
   gestureStartX = event.clientX;
@@ -58,9 +61,9 @@ function handleGestureMove(event: PointerEvent) {
 function handleGestureEnd(event: PointerEvent) {
   if (!nowGesture.value) return;
   event.preventDefault();
-  if (gestureProgress.value > 0.5) {
+  if (!menuOpened.value && gestureProgress.value > 0.25) {
     openMenu();
-  } else {
+  } else if (menuOpened.value && gestureProgress.value < 0.75) {
     closeMenu();
   }
   const target = <HTMLElement>event.target;
@@ -82,6 +85,16 @@ function handleGestureEnd(event: PointerEvent) {
   });
 }
 
+function isFocusableRecursively(element: Element): boolean {
+  if (isFocusable(element)) {
+    return true;
+  }
+  const parent = element.parentElement;
+  if (parent && !parent.isSameNode(rootElement.value)) {
+    return isFocusableRecursively(parent);
+  }
+  return false;
+}
 function updateLayout() {
   const moveMax = document.body.offsetWidth - 56;
   const moveX = gestureLastX - gestureStartX;
@@ -121,7 +134,7 @@ function closeMenu() {
 </script>
 
 <template>
-  <div class="layout" :style="layoutStyles">
+  <div ref="rootElement" class="layout" :style="layoutStyles">
     <div class="layout__menu">
       <TheAppMenu
         ref="menuElement"
@@ -129,7 +142,7 @@ function closeMenu() {
         @deactivate="onDeactivateMenu"
       />
     </div>
-    <div class="layout__main" :class="mainClasses">
+    <div class="layout__main" :class="mainClasses" @click="">
       <TheAppHeader @open-menu="openMenu">
         <template #title>{{ currentRouteName }}</template>
       </TheAppHeader>
