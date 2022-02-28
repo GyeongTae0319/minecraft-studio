@@ -151,7 +151,6 @@ function closeMenu() {
     left: 0;
 
     padding-right: 64px;
-    background-color: $color-background-darker;
   }
   &__main {
     position: relative;

@@ -3,7 +3,7 @@
 
   --color-background-normal: rgb(45 50 57);
   --color-background-dark: rgb(37 40 45);
-  --color-background-darker: rgb(28 30 33);
+  --color-background-darkest: rgb(28 30 33);
   --color-font-strong: rgba(255 255 255 / 1);
   --color-font-normal: rgba(255 255 255 / 0.75);
   --color-font-disabled: rgba(255 255 255 / 0.38);
@@ -29,7 +29,7 @@
 
 html {
   user-select: none;
-  background-color: var(--color-background-darker);
+  background-color: var(--color-background-darkest);
   color: var(--color-font-normal);
 }
 html,
