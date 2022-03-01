@@ -2,6 +2,9 @@
 import { createFocusTrap, FocusTrap } from "focus-trap";
 import { NavigationFailure } from "vue-router";
 
+interface Props {
+  focusDelay: number;
+}
 interface Emits {
   (event: "activate"): void;
   (event: "deactivate"): void;
@@ -14,8 +17,10 @@ interface Link {
 }
 type RouterNavigate = (e?: MouseEvent) => Promise<void | NavigationFailure>;
 
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const { focusDelay } = toRefs(props);
 const links: Link[] = [
   {
     icon: "Test",
@@ -60,8 +65,10 @@ function show() {
   if (isActive.value) return;
   history.pushState({}, "");
   isActive.value = true;
-  activateFocusTrap();
   emit("activate");
+  setTimeout(() => {
+    activateFocusTrap();
+  }, focusDelay.value);
 }
 function close() {
   if (!isActive.value) return;
@@ -80,8 +87,10 @@ function activateFocusTrap() {
 function doDeactivate() {
   if (!isActive.value) return;
   isActive.value = false;
-  focusTrap.deactivate();
   emit("deactivate");
+  setTimeout(() => {
+    focusTrap.deactivate();
+  }, focusDelay.value);
 }
 function doNavigate(next: RouterNavigate) {
   popStateAction = () => nextTick(next);
