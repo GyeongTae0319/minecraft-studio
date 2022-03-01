@@ -32,16 +32,6 @@ const layoutStyles = computed<Record<string, string>>(() => {
     "--overlay-opacity": `${gestureProgress.value}`,
   };
 });
-const headerClasses = computed(() => ({
-  "layout__header--menu": menuOpened.value,
-  "layout__header--gesture": nowGesture.value,
-  "layout__header--no-gesture": !nowGesture.value,
-}));
-const mainClasses = computed(() => ({
-  "layout__main--menu": menuOpened.value,
-  "layout__main--gesture": nowGesture.value,
-  "layout__main--no-gesture": !nowGesture.value,
-}));
 
 function handleGestureStart(event: PointerEvent) {
   if (event.button !== 0 || event.buttons !== 1) return;
@@ -145,14 +135,10 @@ function closeMenu() {
         @deactivate="onDeactivateMenu"
       />
     </div>
-    <TheAppHeader
-      class="layout__header"
-      :class="headerClasses"
-      @open-menu="openMenu"
-    >
+    <TheAppHeader class="layout__header" @open-menu="openMenu">
       <template #title>{{ currentRouteName }}</template>
     </TheAppHeader>
-    <div ref="mainElement" class="layout__main" :class="mainClasses">
+    <div ref="mainElement" class="layout__main">
       <slot />
     </div>
     <div class="layout__overlay" @click="closeMenu" />
