@@ -9,17 +9,31 @@ const currentRouteName = computed(() => {
 });
 const rootElement = ref<HTMLDivElement>(null);
 const menuElement = ref<TheAppMenuInstance>(null);
+const mainElement = ref<HTMLDivElement>(null);
 const menuOpened = ref(false);
 const nowGesture = ref(false);
 let pendingUpdateLayout = false;
 let gestureStartX = 0;
 let gestureLastX = 0;
-let gestureMoveX = ref(0);
 let gestureProgress = ref(0);
 
-const layoutStyles = computed<Record<string, string>>(() => ({
-  "--gesture-move-x": gestureMoveX.value + "px",
-  "--gesture-progress": String(gestureProgress.value),
+const layoutStyles = computed<Record<string, string>>(() => {
+  const transitionDuration = nowGesture.value ? "0" : "0.2s";
+  const overlayDisplay =
+    menuOpened.value || nowGesture.value ? "block" : "none";
+
+  return {
+    "--gesture-progress": String(gestureProgress.value),
+    "--transition-duration": transitionDuration,
+    "--main-transform-x": `calc((100vw - 56px) * ${gestureProgress.value})`,
+    "--overlay-display": overlayDisplay,
+    "--overlay-opacity": `${gestureProgress.value}`,
+  };
+});
+const headerClasses = computed(() => ({
+  "layout__header--menu": menuOpened.value,
+  "layout__header--gesture": nowGesture.value,
+  "layout__header--no-gesture": !nowGesture.value,
 }));
 const mainClasses = computed(() => ({
   "layout__main--menu": menuOpened.value,
@@ -65,6 +79,12 @@ function handleGestureEnd(event: PointerEvent) {
     openMenu();
   } else if (menuOpened.value && gestureProgress.value < 0.75) {
     closeMenu();
+  } else {
+    if (menuOpened.value) {
+      gestureProgress.value = 1;
+    } else {
+      gestureProgress.value = 0;
+    }
   }
   const target = <HTMLElement>event.target;
   target.releasePointerCapture(event.pointerId);
@@ -72,17 +92,6 @@ function handleGestureEnd(event: PointerEvent) {
   nowGesture.value = false;
   gestureStartX = 0;
   gestureLastX = 0;
-
-  nextTick(() => {
-    const moveMax = document.body.offsetWidth - 56;
-    if (menuOpened.value) {
-      gestureMoveX.value = moveMax;
-      gestureProgress.value = 1;
-    } else {
-      gestureMoveX.value = 0;
-      gestureProgress.value = 0;
-    }
-  });
 }
 
 function isFocusableRecursively(element: Element): boolean {
@@ -106,7 +115,6 @@ function updateLayout() {
   }
   if (to < 0) to = 0;
   else if (to > moveMax) to = moveMax;
-  gestureMoveX.value = to;
   gestureProgress.value = to / moveMax;
   nextTick(() => {
     pendingUpdateLayout = false;
@@ -114,15 +122,19 @@ function updateLayout() {
 }
 
 function onActivateMenu() {
-  const moveMax = document.body.offsetWidth - 56;
   menuOpened.value = true;
-  gestureMoveX.value = moveMax;
   gestureProgress.value = 1;
 }
 function onDeactivateMenu() {
   menuOpened.value = false;
-  gestureMoveX.value = 0;
   gestureProgress.value = 0;
+}
+
+function onClickMain(event: MouseEvent) {
+  const target = <HTMLElement>event.target;
+  if (menuOpened.value && mainElement.value.isSameNode(target)) {
+    closeMenu();
+  }
 }
 
 function openMenu() {
@@ -137,27 +149,37 @@ function closeMenu() {
   <div ref="rootElement" class="layout" :style="layoutStyles">
     <div class="layout__menu">
       <TheAppMenu
+        :focus-delay="200"
         ref="menuElement"
         @activate="onActivateMenu"
         @deactivate="onDeactivateMenu"
       />
     </div>
-    <div class="layout__main" :class="mainClasses" @click="">
-      <TheAppHeader @open-menu="openMenu">
-        <template #title>{{ currentRouteName }}</template>
-      </TheAppHeader>
+    <TheAppHeader
+      class="layout__header"
+      :class="headerClasses"
+      @open-menu="openMenu"
+    >
+      <template #title>{{ currentRouteName }}</template>
+    </TheAppHeader>
+    <div
+      ref="mainElement"
+      class="layout__main"
+      :class="mainClasses"
+      @click="onClickMain"
+    >
       <slot />
     </div>
+    <div class="layout__overlay" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .layout {
   touch-action: pan-y pinch-zoom;
-  height: 100%;
 
   &__menu {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
@@ -165,49 +187,39 @@ function closeMenu() {
 
     padding-right: 64px;
   }
+  &__header {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+
+    transform: translateX(var(--main-transform-x));
+    transition: transform var(--transition-duration);
+  }
   &__main {
     position: relative;
-
+    z-index: 0;
     height: 100%;
-    background-color: $color-background-normal;
+    transform: translateX(var(--main-transform-x));
+    transition: transform var(--transition-duration);
+  }
+  &__overlay {
+    display: var(--overlay-display);
+    opacity: var(--overlay-opacity);
 
-    &::after {
-      content: "";
-      display: none;
-      opacity: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+    background-color: rgba(0 0 0 / 0.2);
 
-      background-color: rgba(0 0 0 / 0.2);
-    }
-
-    &--menu {
-      transform: translateX(calc(100% - 56px));
-
-      &::after {
-        display: block;
-        opacity: 1;
-      }
-    }
-    &--no-gesture {
-      transition: transform 0.2s;
-
-      &::after {
-        transition: opacity 0.2s;
-      }
-    }
-    &--gesture {
-      transform: translateX(calc((100% - 56px) * var(--gesture-progress)));
-
-      &::after {
-        display: block;
-        opacity: var(--gesture-progress);
-      }
-    }
+    transform: translateX(var(--main-transform-x));
+    transition-property: opacity transform;
+    transition-duration: var(--transition-duration);
   }
 }
 </style>
