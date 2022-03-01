@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="home">
+  <PageWrapper class="page">
     <div class="flex">
       <McButton class="flex__button">
         <div class="flex__button__container">
@@ -339,11 +339,11 @@
       perspiciatis ab eius esse accusantium cum distinctio perferendis,
       praesentium voluptate! Eius, ab ut.
     </p>
-  </div>
+  </PageWrapper>
 </template>
 
 <style lang="scss" scoped>
-.home {
+.page {
   display: flex;
   flex-direction: column;
   gap: 16px;
