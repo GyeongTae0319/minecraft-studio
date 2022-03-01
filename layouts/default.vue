@@ -4,6 +4,8 @@ import TheAppMenu from "~/components/organisms/TheAppMenu.vue";
 
 type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
 
+useLayout().value.top = "56px";
+
 const currentRouteName = computed(() => {
   return useRoute().name;
 });
@@ -40,19 +42,6 @@ const mainClasses = computed(() => ({
   "layout__main--gesture": nowGesture.value,
   "layout__main--no-gesture": !nowGesture.value,
 }));
-
-onMounted(() => {
-  window.addEventListener("pointerdown", handleGestureStart, true);
-  window.addEventListener("pointermove", handleGestureMove, true);
-  window.addEventListener("pointerup", handleGestureEnd, true);
-  window.addEventListener("pointercancel", handleGestureEnd, true);
-});
-onUnmounted(() => {
-  window.removeEventListener("pointerdown", handleGestureStart, true);
-  window.removeEventListener("pointermove", handleGestureMove, true);
-  window.removeEventListener("pointerup", handleGestureEnd, true);
-  window.removeEventListener("pointercancel", handleGestureEnd, true);
-});
 
 function handleGestureStart(event: PointerEvent) {
   if (event.button !== 0 || event.buttons !== 1) return;
@@ -130,13 +119,6 @@ function onDeactivateMenu() {
   gestureProgress.value = 0;
 }
 
-function onClickMain(event: MouseEvent) {
-  const target = <HTMLElement>event.target;
-  if (menuOpened.value && mainElement.value.isSameNode(target)) {
-    closeMenu();
-  }
-}
-
 function openMenu() {
   menuElement.value.show();
 }
@@ -146,7 +128,15 @@ function closeMenu() {
 </script>
 
 <template>
-  <div ref="rootElement" class="layout" :style="layoutStyles">
+  <div
+    ref="rootElement"
+    class="layout"
+    :style="layoutStyles"
+    @pointerdown.capture="handleGestureStart"
+    @pointermove.capture="handleGestureMove"
+    @pointerup.capture="handleGestureEnd"
+    @pointercancel.capture="handleGestureEnd"
+  >
     <div class="layout__menu">
       <TheAppMenu
         :focus-delay="200"
@@ -162,15 +152,10 @@ function closeMenu() {
     >
       <template #title>{{ currentRouteName }}</template>
     </TheAppHeader>
-    <div
-      ref="mainElement"
-      class="layout__main"
-      :class="mainClasses"
-      @click="onClickMain"
-    >
+    <div ref="mainElement" class="layout__main" :class="mainClasses">
       <slot />
     </div>
-    <div class="layout__overlay" />
+    <div class="layout__overlay" @click="closeMenu" />
   </div>
 </template>
 
