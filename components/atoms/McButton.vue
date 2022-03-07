@@ -32,10 +32,10 @@ const ThemeStyleMap: Record<Theme, ThemeStyle> = {
 const props = withDefaults(defineProps<Props>(), {
   theme: "default",
 });
-const { theme } = props;
+const { theme } = toRefs(props);
 
 const rootStyles = computed((): Record<string, string> => {
-  return ThemeStyleMap[theme];
+  return ThemeStyleMap[theme.value];
 });
 </script>
 
