@@ -1,5 +1,46 @@
+<script setup lang="ts">
+import borderImageDefault from "~/assets/sprites/mc-button-default.png";
+import borderImagePrimary from "~/assets/sprites/mc-button-primary.png";
+
+type Theme = "default" | "primary";
+interface ThemeStyle extends Record<string, string> {
+  "--font-color": string;
+  "--border-image": string;
+  "--background-color": string;
+  "--side-color": string;
+}
+
+interface Props {
+  theme?: Theme;
+}
+
+const ThemeStyleMap: Record<Theme, ThemeStyle> = {
+  default: {
+    "--font-color": "rgb(30 30 31)",
+    "--border-image": `url("${borderImageDefault}")`,
+    "--background-color": "#d0d1d4",
+    "--side-color": "#58585a",
+  },
+  primary: {
+    "--font-color": "var(--color-font-strong)",
+    "--border-image": `url("${borderImagePrimary}")`,
+    "--background-color": "#3c8527",
+    "--side-color": "#1D4D13",
+  },
+};
+
+const props = withDefaults(defineProps<Props>(), {
+  theme: "default",
+});
+const { theme } = props;
+
+const rootStyles = computed((): Record<string, string> => {
+  return ThemeStyleMap[theme];
+});
+</script>
+
 <template>
-  <button class="mc-button" @contextmenu.prevent>
+  <button class="mc-button" :style="rootStyles" @contextmenu.prevent>
     <div class="mc-button__container">
       <slot />
     </div>
@@ -10,10 +51,10 @@
 .mc-button {
   padding-bottom: calc(var(--pixel-unit) * 2);
 
-  background-color: #58585a;
+  background-color: var(--side-color);
   border: var(--pixel-unit) solid rgb(30 30 31);
 
-  color: rgb(30 30 31);
+  color: var(--font-color);
   font-size: x-large;
   font-weight: bold;
 
@@ -25,7 +66,6 @@
   &:active {
     margin-top: calc(var(--pixel-unit) * 2);
     padding-bottom: 0;
-    color: var(--color-font-strong);
   }
 
   &__container {
@@ -37,16 +77,11 @@
     height: 100%;
     padding: 8px 12px;
 
-    background-color: #d0d1d4;
+    background-color: var(--background-color);
     border: var(--pixel-unit) solid;
-    border-image: url("~/assets/sprites/button-default.png") 1;
+    border-image: var(--border-image) 1;
 
     text-align: center;
-
-    .mc-button:active > & {
-      background-color: #3c8527;
-      border-image-source: url("~/assets/sprites/button-active.png");
-    }
   }
 }
 </style>
