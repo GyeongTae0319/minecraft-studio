@@ -2,7 +2,11 @@ import { defineNuxtConfig } from "nuxt3";
 
 export default defineNuxtConfig({
   components: {
-    dirs: ["~/components/atoms", "~/components/molecules", "~/components/organisms"],
+    dirs: [
+      "~/components/atoms",
+      "~/components/molecules",
+      "~/components/organisms",
+    ],
   },
   vite: {
     css: {
