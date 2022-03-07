@@ -79,6 +79,7 @@ function activateFocusTrap() {
   if (!focusTrap) {
     focusTrap = createFocusTrap(rootElement.value, {
       allowOutsideClick: true,
+      clickOutsideDeactivates: false,
       escapeDeactivates: false,
     });
   }

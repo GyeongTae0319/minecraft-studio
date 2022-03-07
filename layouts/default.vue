@@ -6,9 +6,6 @@ type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
 
 useLayout().value.top = "56px";
 
-const currentRouteName = computed(() => {
-  return useRoute().name;
-});
 const rootElement = ref<HTMLDivElement>(null);
 const menuElement = ref<TheAppMenuInstance>(null);
 const mainElement = ref<HTMLDivElement>(null);
@@ -19,13 +16,15 @@ let gestureStartX = 0;
 let gestureLastX = 0;
 let gestureProgress = ref(0);
 
+const currentRouteName = computed(() => {
+  return useRoute().name;
+});
 const layoutStyles = computed<Record<string, string>>(() => {
   const transitionDuration = nowGesture.value ? "0" : "0.2s";
-  const overlayDisplay =
-    menuOpened.value || nowGesture.value ? "block" : "none";
+  const showOverlay = menuOpened.value || nowGesture.value;
+  const overlayDisplay = showOverlay ? "block" : "none";
 
   return {
-    "--gesture-progress": String(gestureProgress.value),
     "--transition-duration": transitionDuration,
     "--main-transform-x": `calc((100vw - 56px) * ${gestureProgress.value})`,
     "--overlay-display": overlayDisplay,
@@ -102,11 +101,15 @@ function updateLayout() {
 
 function onActivateMenu() {
   menuOpened.value = true;
-  gestureProgress.value = 1;
+  nextTick(() => {
+    gestureProgress.value = 1;
+  });
 }
 function onDeactivateMenu() {
   menuOpened.value = false;
-  gestureProgress.value = 0;
+  nextTick(() => {
+    gestureProgress.value = 0;
+  });
 }
 
 function openMenu() {
