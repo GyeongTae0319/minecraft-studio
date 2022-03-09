@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import borderImageDefault from "~/assets/sprites/mc-button-default.png";
 import borderImagePrimary from "~/assets/sprites/mc-button-primary.png";
+import { Props as AppButtonProps } from "~/components/atoms/AppButton.vue";
 
 type Theme = "default" | "primary";
 interface ThemeStyle extends Record<string, string> {
@@ -9,11 +10,6 @@ interface ThemeStyle extends Record<string, string> {
   "--background-color": string;
   "--side-color": string;
 }
-
-interface Props {
-  theme?: Theme;
-}
-
 const ThemeStyleMap: Record<Theme, ThemeStyle> = {
   default: {
     "--font-color": "rgb(30 30 31)",
@@ -29,22 +25,39 @@ const ThemeStyleMap: Record<Theme, ThemeStyle> = {
   },
 };
 
+interface Props extends AppButtonProps {
+  theme?: Theme;
+  active?: boolean;
+}
 const props = withDefaults(defineProps<Props>(), {
   theme: "default",
+  active: false,
 });
-const { theme } = toRefs(props);
+const { to, href, theme, active } = toRefs(props);
 
+const rootClasses = computed((): Record<string, boolean> => {
+  return {
+    "mc-button--active": active.value,
+  };
+});
 const rootStyles = computed((): Record<string, string> => {
   return ThemeStyleMap[theme.value];
 });
 </script>
 
 <template>
-  <button class="mc-button" :style="rootStyles" @contextmenu.prevent>
+  <AppButton
+    :to="to"
+    :href="href"
+    class="mc-button"
+    :class="rootClasses"
+    :style="rootStyles"
+    @contextmenu.prevent
+  >
     <div class="mc-button__container">
       <slot />
     </div>
-  </button>
+  </AppButton>
 </template>
 
 <style lang="scss" scoped>
@@ -63,6 +76,7 @@ const rootStyles = computed((): Record<string, string> => {
   &:focus-visible {
     box-shadow: 0 0 0 var(--pixel-unit) #ffffff;
   }
+  &--active,
   &:active {
     margin-top: calc(var(--pixel-unit) * 2);
     padding-bottom: 0;

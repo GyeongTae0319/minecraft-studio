@@ -2,7 +2,7 @@
 import { DefineComponent } from "nuxt3/dist/app/compat/capi";
 import { RouteLocationRaw } from "vue-router";
 
-interface Props {
+export interface Props {
   to?: RouteLocationRaw;
   href?: string;
 }
