@@ -2,7 +2,7 @@
 const layout = useLayout();
 
 const rootStyles = computed<Record<string, string>>(() => {
-  const { top, right, bottom, left } = layout.value;
+  const { top, right, bottom, left } = layout.value.margin;
 
   return {
     "--layout-inset": `${top} ${right} ${bottom} ${left}`,
