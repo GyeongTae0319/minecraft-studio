@@ -6,5 +6,8 @@ export const useLayout = () => {
       bottom: "0",
       left: "0",
     },
+    bodyScrollLock: false,
+    bodyScrollTop: -1,
+    bodyScrollbarWidth: 0,
   }));
 };
