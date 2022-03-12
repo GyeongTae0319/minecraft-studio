@@ -29,6 +29,14 @@
 
 html {
   user-select: none;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
   background-color: var(--color-background-darkest);
   color: var(--color-font-normal);
+}
+body,
+#__nuxt {
+  width: 100%;
+  height: 100%;
 }

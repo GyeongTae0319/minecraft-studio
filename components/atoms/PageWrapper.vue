@@ -20,6 +20,8 @@ const rootStyles = computed<Record<string, string>>(() => {
 
 <style lang="scss" scoped>
 .page-wrapper {
+  width: 100%;
+  min-height: 100%;
   background-color: $color-background-normal;
 
   &__slot-wrapper {
