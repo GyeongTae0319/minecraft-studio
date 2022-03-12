@@ -4,7 +4,8 @@ import TheAppMenu from "~/components/organisms/TheAppMenu.vue";
 
 type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
 
-useLayout().value.top = "56px";
+const layout = useLayout();
+layout.value.margin.top = "56px";
 
 const rootElement = ref<HTMLDivElement>(null);
 const menuElement = ref<TheAppMenuInstance>(null);
@@ -20,13 +21,15 @@ const currentRouteName = computed(() => {
   return useRoute().name;
 });
 const layoutStyles = computed<Record<string, string>>(() => {
-  const transitionDuration = nowGesture.value ? "0" : "0.2s";
+  const transitionDuration = nowGesture.value ? "0" : "0.25s";
   const showOverlay = menuOpened.value || nowGesture.value;
   const overlayDisplay = showOverlay ? "block" : "none";
 
   return {
     "--transition-duration": transitionDuration,
-    "--main-transform-x": `calc((100vw - 56px) * ${gestureProgress.value})`,
+    "--main-transform-x": `calc(${100 * gestureProgress.value}% - ${
+      56 * gestureProgress.value
+    }px)`,
     "--overlay-display": overlayDisplay,
     "--overlay-opacity": `${gestureProgress.value}`,
   };
@@ -39,6 +42,7 @@ function handleGestureStart(event: PointerEvent) {
   event.preventDefault();
   target.setPointerCapture(event.pointerId);
   nowGesture.value = true;
+  layout.value.bodyScrollLock = true;
   gestureStartX = event.clientX;
 }
 function handleGestureMove(event: PointerEvent) {
@@ -68,6 +72,7 @@ function handleGestureEnd(event: PointerEvent) {
   target.releasePointerCapture(event.pointerId);
   pendingUpdateLayout = false;
   nowGesture.value = false;
+  layout.value.bodyScrollLock = false;
   gestureStartX = 0;
   gestureLastX = 0;
 }
@@ -101,15 +106,13 @@ function updateLayout() {
 
 function onActivateMenu() {
   menuOpened.value = true;
-  nextTick(() => {
-    gestureProgress.value = 1;
-  });
+  layout.value.bodyScrollLock = true;
+  gestureProgress.value = 1;
 }
 function onDeactivateMenu() {
   menuOpened.value = false;
-  nextTick(() => {
-    gestureProgress.value = 0;
-  });
+  layout.value.bodyScrollLock = false;
+  gestureProgress.value = 0;
 }
 
 function openMenu() {
@@ -132,7 +135,7 @@ function closeMenu() {
   >
     <div class="layout__menu">
       <TheAppMenu
-        :focus-delay="200"
+        :focus-delay="250"
         ref="menuElement"
         @activate="onActivateMenu"
         @deactivate="onDeactivateMenu"
@@ -151,22 +154,24 @@ function closeMenu() {
 <style lang="scss" scoped>
 .layout {
   touch-action: pan-y pinch-zoom;
+  width: 100%;
+  height: 100%;
 
   &__menu {
     position: fixed;
     top: 0;
-    right: 0;
-    bottom: 0;
     left: 0;
 
+    width: 100%;
+    height: 100%;
     padding-right: 64px;
   }
   &__header {
     position: fixed;
     z-index: 1;
     top: 0;
-    right: 0;
     left: 0;
+    width: 100%;
 
     transform: translateX(var(--main-transform-x));
     transition: transform var(--transition-duration);
@@ -174,6 +179,7 @@ function closeMenu() {
   &__main {
     position: relative;
     z-index: 0;
+    width: 100%;
     height: 100%;
     transform: translateX(var(--main-transform-x));
     transition: transform var(--transition-duration);
@@ -185,14 +191,15 @@ function closeMenu() {
     position: fixed;
     z-index: 1;
     top: 0;
-    right: 0;
-    bottom: 0;
     left: 0;
+
+    width: 100%;
+    height: 100%;
 
     background-color: rgba(0 0 0 / 0.2);
 
     transform: translateX(var(--main-transform-x));
-    transition-property: opacity transform;
+    transition-property: opacity, transform;
     transition-duration: var(--transition-duration);
   }
 }
