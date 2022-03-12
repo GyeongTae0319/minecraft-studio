@@ -104,7 +104,6 @@ function onMainTransitionEnd() {
 
 <style lang="scss" scoped>
 .layout {
-  touch-action: pan-y pinch-zoom;
   width: 100%;
   height: 100%;
 
