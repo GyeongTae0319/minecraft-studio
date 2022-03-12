@@ -33,14 +33,16 @@ function closeMenu() {
 
 function onGestureStart() {
   nowGesture.value = true;
-  layout.value.bodyScrollLock = true;
 }
 function onGestureMove(moveX: number) {
+  if (!layout.value.bodyScrollLock) {
+    layout.value.bodyScrollLock = true;
+  }
   const max = document.documentElement.offsetWidth;
-  let to = menuOpened.value ? max + moveX : moveX;
-  if (to < 0) to = 0;
-  if (to > max) to = max;
-  gestureProgress.value = to / max;
+  let curProgress = menuOpened.value ? max + moveX : moveX;
+  if (curProgress < 0) curProgress = 0;
+  if (curProgress > max) curProgress = max;
+  gestureProgress.value = curProgress / max;
 }
 function onGestureEnd() {
   nowGesture.value = false;
@@ -50,6 +52,9 @@ function onGestureEnd() {
     closeMenu();
   } else {
     gestureProgress.value = menuOpened.value ? 1 : 0;
+  }
+  if (gestureProgress.value === 0) {
+    layout.value.bodyScrollLock = false;
   }
 }
 
