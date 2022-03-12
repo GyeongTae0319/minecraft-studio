@@ -36,6 +36,7 @@ const links: Link[] = [
 ];
 const rootElement = ref<HTMLElement>(null);
 let focusTrap: FocusTrap = null;
+let focusTimeout = -1;
 let popStateAction: Function = null;
 const isActive = ref(false);
 
@@ -66,13 +67,14 @@ function show() {
   history.pushState({}, "");
   isActive.value = true;
   emit("activate");
-  setTimeout(() => {
+  window.clearTimeout(focusTimeout);
+  focusTimeout = window.setTimeout(() => {
     activateFocusTrap();
   }, focusDelay.value);
 }
 function close() {
   if (!isActive.value) return;
-  useRouter().back();
+  history.back();
 }
 
 function activateFocusTrap() {
@@ -89,8 +91,9 @@ function doDeactivate() {
   if (!isActive.value) return;
   isActive.value = false;
   emit("deactivate");
-  setTimeout(() => {
-    focusTrap.deactivate();
+  window.clearTimeout(focusTimeout);
+  focusTimeout = window.setTimeout(() => {
+    focusTrap?.deactivate();
   }, focusDelay.value);
 }
 function doNavigate(next: RouterNavigate) {
