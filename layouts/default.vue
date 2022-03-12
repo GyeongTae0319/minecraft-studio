@@ -7,15 +7,14 @@ const layout = useLayout();
 layout.value.margin.top = "56px";
 
 const menuElement = ref<TheAppMenuInstance>(null);
-const mainElement = ref<HTMLDivElement>(null);
 const menuOpened = ref(false);
 const nowGesture = ref(false);
-let gestureProgress = ref(0);
+const gestureProgress = ref(0);
 
 const currentRouteName = computed(() => {
   return useRoute().name;
 });
-const layoutStyles = computed<Record<string, string>>(() => {
+const rootStyles = computed<Record<string, string>>(() => {
   const progress = gestureProgress.value;
   return {
     "--transition-duration": nowGesture.value ? "0" : "0.25s",
@@ -75,7 +74,7 @@ function onMainTransitionEnd() {
 <template>
   <LayoutGestureWrapper
     class="layout"
-    :style="layoutStyles"
+    :style="rootStyles"
     @start="onGestureStart"
     @move="onGestureMove"
     @end="onGestureEnd"
@@ -91,11 +90,7 @@ function onMainTransitionEnd() {
     <TheAppHeader class="layout__header" @open-menu="openMenu">
       <template #title>{{ currentRouteName }}</template>
     </TheAppHeader>
-    <div
-      ref="mainElement"
-      class="layout__main"
-      @transitionend="onMainTransitionEnd"
-    >
+    <div class="layout__main" @transitionend="onMainTransitionEnd">
       <slot />
     </div>
     <div class="layout__overlay" @click="closeMenu" />
