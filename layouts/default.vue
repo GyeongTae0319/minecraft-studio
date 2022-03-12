@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { isFocusable } from "tabbable";
 import TheAppMenu from "~/components/organisms/TheAppMenu.vue";
 
 type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
@@ -7,14 +6,10 @@ type TheAppMenuInstance = InstanceType<typeof TheAppMenu>;
 const layout = useLayout();
 layout.value.margin.top = "56px";
 
-const rootElement = ref<HTMLDivElement>(null);
 const menuElement = ref<TheAppMenuInstance>(null);
 const mainElement = ref<HTMLDivElement>(null);
 const menuOpened = ref(false);
 const nowGesture = ref(false);
-let pendingUpdateLayout = false;
-let gestureStartX = 0;
-let gestureLastX = 0;
 let gestureProgress = ref(0);
 
 const currentRouteName = computed(() => {
@@ -35,103 +30,60 @@ const layoutStyles = computed<Record<string, string>>(() => {
   };
 });
 
-function handleGestureStart(event: PointerEvent) {
-  if (event.button !== 0 || event.buttons !== 1) return;
-  const target = <HTMLElement>event.target;
-  if (isFocusableRecursively(target)) return;
-  event.preventDefault();
-  target.setPointerCapture(event.pointerId);
-  nowGesture.value = true;
-  layout.value.bodyScrollLock = true;
-  gestureStartX = event.clientX;
-}
-function handleGestureMove(event: PointerEvent) {
-  if (!nowGesture.value) return;
-  event.preventDefault();
-  if (!gestureStartX) return;
-  gestureLastX = event.clientX;
-  if (pendingUpdateLayout) return;
-  pendingUpdateLayout = true;
-  requestAnimationFrame(updateLayout);
-}
-function handleGestureEnd(event: PointerEvent) {
-  if (!nowGesture.value) return;
-  event.preventDefault();
-  if (!menuOpened.value && gestureProgress.value > 0.25) {
-    openMenu();
-  } else if (menuOpened.value && gestureProgress.value < 0.75) {
-    closeMenu();
-  } else {
-    if (menuOpened.value) {
-      gestureProgress.value = 1;
-    } else {
-      gestureProgress.value = 0;
-    }
-  }
-  const target = <HTMLElement>event.target;
-  target.releasePointerCapture(event.pointerId);
-  pendingUpdateLayout = false;
-  nowGesture.value = false;
-  layout.value.bodyScrollLock = false;
-  gestureStartX = 0;
-  gestureLastX = 0;
-}
-
-function isFocusableRecursively(element: Element): boolean {
-  if (isFocusable(element)) {
-    return true;
-  }
-  const parent = element.parentElement;
-  if (parent && !parent.isSameNode(rootElement.value)) {
-    return isFocusableRecursively(parent);
-  }
-  return false;
-}
-function updateLayout() {
-  const moveMax = document.body.offsetWidth - 56;
-  const moveX = gestureLastX - gestureStartX;
-  let to = 0;
-  if (menuOpened.value) {
-    to = moveMax + moveX;
-  } else {
-    to = moveX;
-  }
-  if (to < 0) to = 0;
-  else if (to > moveMax) to = moveMax;
-  gestureProgress.value = to / moveMax;
-  nextTick(() => {
-    pendingUpdateLayout = false;
-  });
-}
-
-function onActivateMenu() {
-  menuOpened.value = true;
-  layout.value.bodyScrollLock = true;
-  gestureProgress.value = 1;
-}
-function onDeactivateMenu() {
-  menuOpened.value = false;
-  layout.value.bodyScrollLock = false;
-  gestureProgress.value = 0;
-}
-
 function openMenu() {
   menuElement.value.show();
 }
 function closeMenu() {
   menuElement.value.close();
 }
+
+function onGestureStart() {
+  nowGesture.value = true;
+  layout.value.bodyScrollLock = true;
+}
+function onGestureMove(moveX: number) {
+  const max = document.documentElement.offsetWidth;
+  let to = menuOpened.value ? max + moveX : moveX;
+  if (to < 0) to = 0;
+  if (to > max) to = max;
+  gestureProgress.value = to / max;
+}
+function onGestureEnd() {
+  nowGesture.value = false;
+  if (!menuOpened.value && gestureProgress.value > 0.25) {
+    openMenu();
+  } else if (menuOpened.value && gestureProgress.value < 0.75) {
+    closeMenu();
+  } else {
+    gestureProgress.value = menuOpened.value ? 1 : 0;
+  }
+}
+
+function onActivateMenu() {
+  menuOpened.value = true;
+  gestureProgress.value = 1;
+}
+function onDeactivateMenu() {
+  menuOpened.value = false;
+  gestureProgress.value = 0;
+}
+
+function onMainTransitionEnd() {
+  if (menuOpened.value) {
+    layout.value.bodyScrollLock = true;
+  } else {
+    layout.value.bodyScrollLock = false;
+  }
+}
 </script>
 
 <template>
-  <div
-    ref="rootElement"
+  <LayoutGestureWrapper
     class="layout"
     :style="layoutStyles"
-    @pointerdown.capture="handleGestureStart"
-    @pointermove.capture="handleGestureMove"
-    @pointerup.capture="handleGestureEnd"
-    @pointercancel.capture="handleGestureEnd"
+    @start="onGestureStart"
+    @move="onGestureMove"
+    @end="onGestureEnd"
   >
     <div class="layout__menu">
       <TheAppMenu
@@ -144,11 +96,15 @@ function closeMenu() {
     <TheAppHeader class="layout__header" @open-menu="openMenu">
       <template #title>{{ currentRouteName }}</template>
     </TheAppHeader>
-    <div ref="mainElement" class="layout__main">
+    <div
+      ref="mainElement"
+      class="layout__main"
+      @transitionend="onMainTransitionEnd"
+    >
       <slot />
     </div>
     <div class="layout__overlay" @click="closeMenu" />
-  </div>
+  </LayoutGestureWrapper>
 </template>
 
 <style lang="scss" scoped>
