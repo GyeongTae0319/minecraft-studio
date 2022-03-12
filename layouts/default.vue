@@ -16,16 +16,11 @@ const currentRouteName = computed(() => {
   return useRoute().name;
 });
 const layoutStyles = computed<Record<string, string>>(() => {
-  const transitionDuration = nowGesture.value ? "0" : "0.25s";
-  const showOverlay = menuOpened.value || nowGesture.value;
-  const overlayDisplay = showOverlay ? "block" : "none";
-
+  const progress = gestureProgress.value;
   return {
-    "--transition-duration": transitionDuration,
-    "--main-transform-x": `calc(${100 * gestureProgress.value}% - ${
-      56 * gestureProgress.value
-    }px)`,
-    "--overlay-display": overlayDisplay,
+    "--transition-duration": nowGesture.value ? "0" : "0.25s",
+    "--main-transform-x": `calc(${100 * progress}% - ${56 * progress}px)`,
+    "--overlay-point-event": menuOpened.value ? "unset" : "none",
     "--overlay-opacity": `${gestureProgress.value}`,
   };
 });
@@ -141,8 +136,8 @@ function onMainTransitionEnd() {
     transition: transform var(--transition-duration);
   }
   &__overlay {
-    display: var(--overlay-display);
     opacity: var(--overlay-opacity);
+    pointer-events: var(--overlay-point-event);
 
     position: fixed;
     z-index: 1;
