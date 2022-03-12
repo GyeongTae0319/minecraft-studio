@@ -27,10 +27,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html {
+:root {
   color-scheme: dark;
   user-select: none;
   overflow-x: hidden;
+
   width: 100%;
   height: 100%;
   background-color: var(--color-background-darkest);
