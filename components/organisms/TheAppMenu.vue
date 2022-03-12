@@ -124,10 +124,12 @@ defineExpose({
   &__header {
     display: flex;
     align-items: center;
+    position: relative;
 
     height: 56px;
     padding: 12px 24px;
     background-color: $color-background-dark;
+    box-shadow: 0px 0px 4px rgba(0 0 0 / 0.5);
 
     font-size: x-large;
     font-weight: bold;
@@ -135,7 +137,7 @@ defineExpose({
   &__list-wrapper {
     min-height: calc(100% - 56px);
     padding: 8px;
-    background-color: $color-background-normal;
+    background-color: $color-background-dark;
   }
 }
 </style>

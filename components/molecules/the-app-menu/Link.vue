@@ -25,7 +25,7 @@ const { to, icon, label, exact, focusable } = toRefs(props);
 const focusElement = ref<AppButtonInstance>(null);
 
 const linkClasses = computed(() => ({
-  "the-app-menu-link__link--exact": exact.value,
+  "no-exact": exact.value,
 }));
 
 async function customNavigate(isActive: boolean, navigate: RouterNavigate) {
@@ -45,13 +45,23 @@ defineExpose({
 <template>
   <li class="the-app-menu-link">
     <div class="the-app-menu-link__wrapper" role="listitem">
-      <NuxtLink :to="to" custom v-slot="{ href, isExactActive, navigate }">
+      <NuxtLink
+        :to="to"
+        custom
+        v-slot="{ href, isActive, isExactActive, navigate }"
+      >
         <a
           :href="href"
           ref="focusElement"
           :tabindex="focusable ? 0 : -1"
           class="the-app-menu-link__link"
-          :class="linkClasses"
+          :class="[
+            linkClasses,
+            {
+              'router-link-active': isActive,
+              'router-link-exact-active': isExactActive,
+            },
+          ]"
           @contextmenu.prevent
           @click.prevent="customNavigate(isExactActive, navigate)"
           @keyup.space="customNavigate(isExactActive, navigate)"
@@ -79,23 +89,23 @@ defineExpose({
     padding: 8px;
 
     border-radius: 4px;
-    background-color: rgba(255 255 255 / var(--background-opacity));
+    background-color: rgba(45 50 57 / var(--background-opacity));
 
     text-decoration: none;
 
     transition: background-color 0.1s;
 
-    &:not(.the-app-menu-link__link--exact).router-link-active,
+    &.no-exact.router-link-active,
     &.router-link-exact-active {
-      --background-opacity: 0.12;
+      --background-opacity: 1;
       color: $color-font-strong;
     }
-    &:hover,
-    &:focus-visible {
-      --background-opacity: 0.08;
+    &:hover:hover:hover,
+    &:focus-visible:focus-visible:focus-visible {
+      --background-opacity: 0.75;
     }
-    &:active {
-      --background-opacity: 0.05;
+    &:active:active:active {
+      --background-opacity: 0.5;
     }
 
     &__icon {

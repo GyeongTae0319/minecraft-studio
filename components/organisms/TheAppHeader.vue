@@ -32,7 +32,8 @@ function openMenu() {
   align-items: center;
   padding: 12px;
 
-  background-color: $color-background-dark;
+  background-color: $color-background-normal;
+  box-shadow: 0px 0px 4px rgba(0 0 0 / 0.5);
 
   color: $color-font-strong;
   font-weight: bold;
