@@ -3,16 +3,10 @@
 <template>
   <PageWrapper class="page">
     <div class="flex">
-      <McButton class="flex__button">
+      <McButton to="/block-model" class="flex__button">
         <div class="flex__button__container">
           <AppIcon icon="cube" size="32" />
-          Button
-        </div>
-      </McButton>
-      <McButton theme="primary" class="flex__button">
-        <div class="flex__button__container">
-          <AppIcon icon="cube" size="32" />
-          Button
+          Block Model
         </div>
       </McButton>
     </div>
