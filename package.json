@@ -6,8 +6,10 @@
     "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.6",
     "@types/three": "^0.139.0",
     "focus-trap": "^6.7.3",
+    "lodash-es": "^4.17.21",
     "nuxt3": "latest",
     "sass": "^1.49.9",
     "three": "^0.139.0"
