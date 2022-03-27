@@ -45,7 +45,7 @@ defineExpose({
 <template>
   <li class="the-app-menu-link">
     <div class="the-app-menu-link__wrapper" role="listitem">
-      <NuxtLink
+      <RouterLink
         :to="to"
         custom
         v-slot="{ href, isActive, isExactActive, navigate }"
@@ -71,7 +71,7 @@ defineExpose({
           </span>
           <span class="the-app-menu-link__link__label">{{ label }}</span>
         </a>
-      </NuxtLink>
+      </RouterLink>
     </div>
   </li>
 </template>

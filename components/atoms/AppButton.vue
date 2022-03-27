@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DefineComponent } from "nuxt3/dist/app/compat/capi";
+import { DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
 
 export interface Props {
@@ -16,7 +16,7 @@ const rootElement = ref<
 
 const tagName = computed(() => {
   if (to.value) {
-    return "NuxtLink";
+    return "RouterLink";
   } else if (href.value) {
     return "a";
   } else {
@@ -25,14 +25,14 @@ const tagName = computed(() => {
 });
 const attrs = computed(() => {
   switch (tagName.value) {
-    case "NuxtLink":
+    case "RouterLink":
       return { to: to.value };
     case "a":
       return {
         href: href.value,
         target: "_blank",
       };
-    default:
+    case "button":
       return {};
   }
 });
@@ -41,8 +41,8 @@ function focus() {
   if (rootElement.value instanceof HTMLElement) {
     rootElement.value.focus();
   } else {
-    const anchorElement = <HTMLAnchorElement>rootElement.value?.$el;
-    anchorElement?.focus();
+    const anchorElement = <HTMLAnchorElement>rootElement.value.$el;
+    anchorElement.focus();
   }
 }
 
