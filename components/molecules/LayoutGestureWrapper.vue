@@ -50,7 +50,7 @@ function isInFocusable(element: Element): boolean {
 <template>
   <div
     ref="rootElement"
-    class="layout-guesture-wrapper"
+    class="layout-gesture-wrapper"
     @pointerdown.capture="handleGestureStart"
     @pointermove.capture="handleGestureMove"
     @pointerup.capture="handleGestureEnd"
