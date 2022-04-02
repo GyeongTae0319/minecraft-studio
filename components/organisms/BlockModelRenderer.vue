@@ -12,27 +12,24 @@ onMounted(async () => {
   renderer = new McModelRenderer({
     canvas: canvas.value,
   });
-  const model = await loader.load("minecraft:block/lectern");
+  const model = await loader.load("minecraft:block/torch");
+  // const model = await loader.load("studio:block/dir");
   const parsed = await loader.parse(model);
   const textures = await loader.loadTextures(parsed);
 
   renderer.add(parsed, textures);
 
-  renderer.camera.position.set(256, 256, 256);
+  renderer.camera.position.set(256, 256, -256);
   renderer.camera.lookAt(0, 0, 0);
 
   function anim(t = 0) {
     requestAnimationFrame(anim);
-    renderer.root.rotation.x += 0.01;
+    renderer.root.position.x = Math.sin(t / 128) * 8;
+    // renderer.root.rotation.x += 0.01;
     renderer.root.rotation.y += 0.01;
     renderer.renderer.render(renderer.scene, renderer.camera);
   }
   anim();
-  console.log(
-    renderer.root.children.map((child) => {
-      return child.position;
-    })
-  );
 });
 onUnmounted(() => {
   renderer.destory();

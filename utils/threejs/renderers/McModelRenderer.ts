@@ -1,7 +1,6 @@
 import {
-  BoxGeometry,
+  DirectionalLight,
   Group,
-  Mesh,
   MeshBasicMaterial,
   OrthographicCamera,
   Scene,
@@ -9,32 +8,23 @@ import {
   Vector2,
   WebGLRenderer,
 } from "three";
-import { Model, ModelFaceDirection } from "~/types/minecraft";
+import { Model } from "~/types/minecraft";
+import McModelParser from "../parser/McModelParser";
 
 interface Options {
   canvas: HTMLCanvasElement;
 }
 
-const FaceDirections = Object.freeze([
-  "north",
-  "east",
-  "south",
-  "west",
-  "up",
-  "down",
-]);
-const FaceDirectionOrder = Object.freeze<Record<ModelFaceDirection, number>>({
-  north: 0,
-  east: 4,
-  south: 1,
-  west: 5,
-  up: 2,
-  down: 3,
-});
-
 export default class McModelRenderer {
+  static transparentMaterial = new MeshBasicMaterial({
+    color: 0x000000,
+    opacity: 0,
+    transparent: true,
+  });
+
   canvas: HTMLCanvasElement;
   camera: OrthographicCamera;
+  lights: DirectionalLight[] = [];
   renderer: WebGLRenderer;
   scene: Scene;
   size = new Vector2(0, 0);
@@ -52,6 +42,9 @@ export default class McModelRenderer {
       1,
       3000
     );
+    this.addLight(0.8, 1, 0, 0);
+    this.addLight(0.98, 0, 1, 0);
+    this.addLight(0.608, 0, 0, -1);
     this.renderer = new WebGLRenderer({
       alpha: true,
       canvas: this.canvas,
@@ -66,35 +59,15 @@ export default class McModelRenderer {
   }
 
   add(model: Model, textures: Record<string, Texture>) {
-    this.root = new Group();
-    model.elements?.forEach((element) => {
-      const [x1, y1, z1] = element.from;
-      const [x2, y2, z2] = element.to;
-      const [width, height, depth] = [x2 - x1, y2 - y1, z2 - z1];
-      console.log([x1, y1, z1], [x2, y2, z2], [width, height, depth]);
-      const geometry = new BoxGeometry(width, height, depth);
-      geometry.translate(width / 2 + x1, height / 2 + y1, depth / 2 + z1);
-      const materials = FaceDirections.reduce((acc, dir) => {
-        const index = FaceDirectionOrder[dir];
-        const face = element.faces[dir];
-        if (face) {
-          const key = face.texture.replace(/^#/, "");
-          acc[index] = new MeshBasicMaterial({
-            map: textures[key],
-            transparent: true,
-          });
-        } else {
-          acc[index] = new MeshBasicMaterial({
-            color: 0x000000,
-            transparent: true,
-          });
-        }
-        return acc;
-      }, new Array<MeshBasicMaterial>(6));
-      const cube = new Mesh(geometry, materials);
-      cube.scale.set(16, 16, 16);
-      this.root.add(cube);
-    });
+    const parser = new McModelParser();
+    this.root = parser.parse(model, textures);
     this.scene.add(this.root);
+  }
+  addLight(intensity: number, x: number, y: number, z: number) {
+    const light = new DirectionalLight(0xffffff, intensity);
+    light.position.set(x, y, z);
+    light.lookAt(0, 0, 0);
+    this.scene.add(light);
+    this.lights.push(light);
   }
 }
