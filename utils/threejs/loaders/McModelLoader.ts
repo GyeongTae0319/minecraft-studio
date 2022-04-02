@@ -49,7 +49,7 @@ export default class McModelLoader {
 
   parseTextures(parent: Model, child: Model) {
     if (!parent.textures) return child.textures;
-    const result = { ...parent.textures };
+    const result = { ...parent.textures, ...child.textures };
     Object.entries(result).forEach(([key, value]) => {
       const childKey = value.replace(/^#/, "");
       result[key] = child?.textures[childKey] || value;
