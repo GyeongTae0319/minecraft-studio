@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "studio:block/down",
+    "up": "studio:block/up",
+    "north": "studio:block/north",
+    "south": "studio:block/south",
+    "west": "studio:block/west",
+    "east": "studio:block/east"
+  }
+}
