@@ -31,22 +31,17 @@ export interface ModelElement {
     rescale?: boolean;
   };
   shade?: boolean;
-  faces: Partial<Record<ModelFaceDirection, ModelFace>>;
+  faces: Partial<Record<ModelFaceDir, ModelFace>>;
 }
 export interface ModelFace {
-  uv?: [x1: number, y1: number, x2: number, y2: number];
+  uv?: ModelFaceUV;
   texture: string;
-  cullface?: ModelFaceDirection;
+  cullface?: ModelFaceDir;
   rotation?: 0 | 90 | 180 | 270;
   tintindex?: number;
 }
-export type ModelFaceDirection =
-  | "north"
-  | "east"
-  | "south"
-  | "west"
-  | "up"
-  | "down";
+export type ModelFaceUV = [x1: number, y1: number, x2: number, y2: number];
+export type ModelFaceDir = "north" | "east" | "south" | "west" | "up" | "down";
 export type ModelVector3 = [x: number, y: number, z: number];
 
 export interface TextureMeta {
